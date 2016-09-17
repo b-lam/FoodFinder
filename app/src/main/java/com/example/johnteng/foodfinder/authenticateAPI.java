@@ -13,12 +13,12 @@ import java.net.URL;
 /**
  * Created by johnteng on 16-09-17.
  */
-public class CallAPI extends AsyncTask<String, String, String> {
+public class authenticateAPI extends AsyncTask<String, String, String> {
     private String appID = "IOcbXtzaehe_QsCfBsGE8w";
     private String appSecret = "8aQYbsawHFrnDNJLjGLwKbSseQGsIf5AkaFwHcBg4ZVf8e8drIvLKk0xUtfoYaHw";
 
 
-    public CallAPI(){
+    public authenticateAPI() {
         //set context variables if required
     }
 
@@ -31,7 +31,7 @@ public class CallAPI extends AsyncTask<String, String, String> {
     @Override
     protected String doInBackground(String... params) {
         //https://api.yelp.com/oauth2/token
-       // String urlString = params[0]; // URL to call
+        // String urlString = params[0]; // URL to call
         String urlString = "";
         String resultToDisplay = "";
 
@@ -56,8 +56,7 @@ public class CallAPI extends AsyncTask<String, String, String> {
         try {
             resultToDisplay = IOUtils.toString(in, "UTF-8");
             //to [convert][1] byte stream to a string
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return resultToDisplay;
@@ -68,3 +67,4 @@ public class CallAPI extends AsyncTask<String, String, String> {
     protected void onPostExecute(String result) {
         //Update the UI
     }
+}
