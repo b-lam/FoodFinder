@@ -1,7 +1,10 @@
 package com.example.johnteng.foodfinder;
 
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -17,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,7 +32,9 @@ import com.ibm.watson.developer_cloud.personality_insights.v2.model.Profile;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
+import java.io.InputStream;
 import java.util.List;
 
 import twitter4j.Paging;
@@ -57,6 +63,7 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
     AlertDialog dialogBuilder;
     public final jsonParser jp = new jsonParser();
     JSONObject j = null;
+    readAPI r;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +89,24 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
         edLoc = (EditText) findViewById(R.id.edLoc);
         edHandle = (EditText) findViewById(R.id.edHandle);
         btnFindMe = (Button) findViewById(R.id.btnFindMe);
+
+        TextView tvName = (TextView) findViewById(R.id.tvName);
+        TextView tvURL = (TextView) findViewById(R.id.tvURL);
+        TextView tvPrice = (TextView) findViewById(R.id.tvPrice);
+        TextView tvAddress = (TextView) findViewById(R.id.tvAddress);
+        TextView tvTelephone = (TextView) findViewById(R.id.tvTelephone);
+        ImageView imgBusiness = (ImageView) findViewById(R.id.imgBusiness);
+
+        new DownloadImageTask(imgBusiness).execute("https://s3-media1.fl.yelpcdn.com/bphoto/HENovrpv3Uh0M6UONHT2XA/ms.jpg");
+
+        r = new readAPI(new jsonParser());
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                r.run();
+            }
+        }).start();
 
         btnFindMe.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -245,5 +270,30 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
         });
 
         dialogBuilder.show();
+    }
+
+    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+
+        public DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            bmImage.setImageBitmap(result);
+        }
     }
 }
