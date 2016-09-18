@@ -17,19 +17,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.gson.stream.JsonReader;
 import com.ibm.watson.developer_cloud.personality_insights.v2.PersonalityInsights;
-import com.ibm.watson.developer_cloud.personality_insights.v2.model.Content;
 import com.ibm.watson.developer_cloud.personality_insights.v2.model.Profile;
-import com.ibm.watson.developer_cloud.personality_insights.v2.model.ProfileOptions;
-import com.ibm.watson.developer_cloud.util.GsonSingleton;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.List;
 
 import twitter4j.Paging;
@@ -38,6 +37,7 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
+
 
 
 public class FoodFinder extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
@@ -53,14 +53,19 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
     private final String TWITTER_ACCESS_TOKEN = "335657764-ja1g5iImHeEirRq6CO9BEZlRijbT3UBFb5Q8brBa";
     private final String TWITTER_ACCESS_TOKEN_SECRET = "su3uqGtU3hyFHDrGtPBeRxWQkrfry8NVW4IlbVWBZ1KGk";
     private int CASE;
+    public static boolean authenticate = true;
     AlertDialog dialogBuilder;
+    public final jsonParser jp = new jsonParser();
+    JSONObject j = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_food_finder);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
         setSupportActionBar(toolbar);
+
 
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -173,7 +178,12 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
     public void getPersonalityInsights(String text){
         PersonalityInsights service = new PersonalityInsights();
         service.setUsernameAndPassword(username, password);
-
+        try {
+            j = new JSONObject(text);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        jp.parseWatson(j);
         Profile profile = service.getProfile(text).execute();
         System.out.println(profile);
     }
@@ -201,6 +211,7 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
                 Log.i("Tweet Count " + (i + 1), status.getText() + "\n\n");
             }
             if(text.length() != 0){
+                Log.d("Log","Outputting the JSON data");
                 getPersonalityInsights(text);
             }else{
                 CASE = 2;
