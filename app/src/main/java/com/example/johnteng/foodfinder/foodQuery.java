@@ -9,5 +9,4 @@ public class foodQuery {
     public static Double latitude, longitude;
     public static int radius, limit;
 
-
 }

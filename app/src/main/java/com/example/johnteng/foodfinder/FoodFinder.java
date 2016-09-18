@@ -16,29 +16,16 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
-<<<<<<< HEAD
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-public class FoodFinder extends AppCompatActivity {
-    public static String json = "";
-    public static TextView t;
-    public static boolean authenticate = true;
-=======
-import android.widget.EditText;
 import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.gson.stream.JsonReader;
 import com.ibm.watson.developer_cloud.personality_insights.v2.PersonalityInsights;
-import com.ibm.watson.developer_cloud.personality_insights.v2.model.Content;
 import com.ibm.watson.developer_cloud.personality_insights.v2.model.Profile;
-import com.ibm.watson.developer_cloud.personality_insights.v2.model.ProfileOptions;
-import com.ibm.watson.developer_cloud.util.GsonSingleton;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.util.List;
 
 import twitter4j.Paging;
@@ -47,6 +34,7 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
+
 
 
 public class FoodFinder extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
@@ -62,36 +50,17 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
     private final String TWITTER_ACCESS_TOKEN = "335657764-ja1g5iImHeEirRq6CO9BEZlRijbT3UBFb5Q8brBa";
     private final String TWITTER_ACCESS_TOKEN_SECRET = "su3uqGtU3hyFHDrGtPBeRxWQkrfry8NVW4IlbVWBZ1KGk";
     private int CASE;
+    public static boolean authenticate = true;
     AlertDialog dialogBuilder;
->>>>>>> origin/master
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_food_finder);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        LinearLayout ll = (LinearLayout) findViewById(R.id.ll);
-        ll.setOrientation(LinearLayout.VERTICAL);
         final jsonParser jp = new jsonParser();
 
         setSupportActionBar(toolbar);
-        Button b = new Button(this);
-        b.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        b.setText("Press me to start server");
-        t = new TextView(this);
-        t.setText("HELLO UNIVERSE");
-        ll.addView(b);
-
-        ll.addView(t);
-        b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                readAPI a = new readAPI(jp);
-                a.stopThread();
-                a.start();
-                //t.setText(a.JSONresponse);
-            }
-        });
 
 
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)

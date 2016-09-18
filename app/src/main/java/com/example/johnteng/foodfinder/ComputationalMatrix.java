@@ -7,6 +7,7 @@ import java.util.HashMap;
  * Created by Brandon on 9/18/2016.
  */
 public class ComputationalMatrix {
+    private double JsonFactor = 0;
 
     HashMap<String, Double> priceMap = new HashMap<>();
     HashMap<String, Double> ratingMap = new HashMap<>();
