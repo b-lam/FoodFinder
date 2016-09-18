@@ -17,6 +17,60 @@ import org.json.JSONObject;
 public class jsonParser {
     public jsonParser () {
     }
+    public void parseWatson (JSONObject j) {
+
+        JSONArray dataJsonArray = null;
+        JSONArray dataJsonArray2 = null;
+        JSONArray dataJsonArray3 = null;
+
+        try {
+            dataJsonArray = j.getJSONArray("children");
+            for (int i = 0; i < dataJsonArray.length(); i++) {
+                //Enter first array which selects either Big5, needs, values
+
+
+                JSONObject dataObj = (JSONObject)dataJsonArray.get(i);
+                dataJsonArray2 = dataObj.getJSONArray("children");
+                String ID = dataObj.getString("id");
+                //Takes different action depending on whether Big5, needs, or values is currently selected
+                switch (ID) {
+                    case ("personality")://Big5
+                        for (int k = 0; k<dataJsonArray2.length();k++){
+                            JSONObject dataObj2 = (JSONObject)dataJsonArray2.get(k);
+                            String id = dataObj2.getString("id");
+                            setBig5(id, dataObj2);
+                        }
+                        break;
+                    case ("needs")://needs
+                        for (int x = 0; x<dataJsonArray2.length();x++){
+                            JSONObject dataObj2 = (JSONObject)dataJsonArray2.get(x);
+                            dataJsonArray3 = dataObj2.getJSONArray("children");
+                            for (int y = 0; y<dataJsonArray3.length();y++){
+                                JSONObject dataObj3 = (JSONObject)dataJsonArray3.get(y);
+                                String id = dataObj3.getString("id");
+                                setNeeds(id, dataObj3);
+                            }
+                        }
+                        break;
+                    case ("values")://values
+                        for (int x = 0; x<dataJsonArray2.length();x++){
+                            JSONObject dataObj2 = (JSONObject)dataJsonArray2.get(x);
+                            dataJsonArray3 = dataObj2.getJSONArray("children");
+                            for (int y = 0; y<dataJsonArray3.length();y++){
+                                JSONObject dataObj3 = (JSONObject)dataJsonArray3.get(y);
+                                String id = dataObj3.getString("id");
+                                setValues(id, dataObj3);
+                            }
+                        }
+                        break;
+                }
+            }//End of outer array
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void parseSearchJson (JSONObject j) {
         try {
@@ -76,5 +130,87 @@ public class jsonParser {
         Log.d("Log","The object a contains access token " + authResponse.accessToken);
         Log.d("Log", "The object a contains token type of " + authResponse.tokenType);
         Log.d("Log","The object has an expiry time of " + authResponse.expiresIn);
+    }
+
+
+private void setBig5 (String id, JSONObject dataObj2) throws JSONException {
+    switch (id) {
+        case ("Agreeableness"):
+            personality.agreeableness = dataObj2.getDouble("percentage");
+            break;
+        case ("Conscientiousness"):
+            personality.conscientiousness = dataObj2.getDouble("percentage");
+            break;
+        case ("Extraversion"):
+            personality.extraversion = dataObj2.getDouble("percentage");
+            break;
+        case ("Openness"):
+            personality.openness = dataObj2.getDouble("percentage");
+            break;
+        case ("Neuroticism"):
+            personality.emotionalRange = dataObj2.getDouble("percentage");
+            break;
+    }
+}
+
+    private void setValues (String id, JSONObject dataObj3) throws JSONException {
+        switch (id){
+            case ("Conservation"):
+                personality.tradition = dataObj3.getDouble("percentage");
+                break;
+            case ("Openness to change"):
+                personality.opennessToChange = dataObj3.getDouble("percentage");
+                break;
+            case ("Hedonism"):
+                personality.hedonism = dataObj3.getDouble("percentage");
+                break;
+            case ("Self-enhancement"):
+                personality.achievingSuccess = dataObj3.getDouble("percentage");
+                break;
+            case ("Self-transcendence"):
+                personality.helpingOthers = dataObj3.getDouble("percentage");
+                break;
+        }
+    }
+
+    private void setNeeds (String id, JSONObject dataObj3) throws JSONException {
+        switch (id) {
+            case "Challenge":
+                personality.challenge = dataObj3.getDouble("percentage");
+                break;
+            case "Closeness":
+                personality.closeness = dataObj3.getDouble("percentage");
+                break;
+            case "Curiosity":
+                personality.curiosity = dataObj3.getDouble("percentage");
+                break;
+            case "Excitement":
+                personality.excitement = dataObj3.getDouble("percentage");
+                break;
+            case "Harmony":
+                personality.harmony = dataObj3.getDouble("percentage");
+                break;
+            case "Ideal":
+                personality.ideal = dataObj3.getDouble("percentage");
+                break;
+            case "Liberty":
+                personality.liberty = dataObj3.getDouble("percentage");
+                break;
+            case "Love":
+                personality.love = dataObj3.getDouble("percentage");
+                break;
+            case "Practicality":
+                personality.practicality = dataObj3.getDouble("percentage");
+                break;
+            case "Self-expression":
+                personality.selfExpression = dataObj3.getDouble("percentage");
+                break;
+            case "Stability":
+                personality.stability = dataObj3.getDouble("percentage");
+                break;
+            case "Structure":
+                personality.structure = dataObj3.getDouble("percentage");
+                break;
+        }
     }
 }

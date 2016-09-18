@@ -26,6 +26,9 @@ import com.google.android.gms.location.LocationServices;
 import com.ibm.watson.developer_cloud.personality_insights.v2.PersonalityInsights;
 import com.ibm.watson.developer_cloud.personality_insights.v2.model.Profile;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.List;
 
 import twitter4j.Paging;
@@ -52,13 +55,14 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
     private int CASE;
     public static boolean authenticate = true;
     AlertDialog dialogBuilder;
+    public final jsonParser jp = new jsonParser();
+    JSONObject j = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_food_finder);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        final jsonParser jp = new jsonParser();
 
         setSupportActionBar(toolbar);
 
@@ -174,7 +178,12 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
     public void getPersonalityInsights(String text){
         PersonalityInsights service = new PersonalityInsights();
         service.setUsernameAndPassword(username, password);
-
+        try {
+            j = new JSONObject(text);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        jp.parseWatson(j);
         Profile profile = service.getProfile(text).execute();
         System.out.println(profile);
     }
@@ -202,6 +211,7 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
                 Log.i("Tweet Count " + (i + 1), status.getText() + "\n\n");
             }
             if(text.length() != 0){
+                Log.d("Log","Outputting the JSON data");
                 getPersonalityInsights(text);
             }else{
                 CASE = 2;
