@@ -8,15 +8,43 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 public class FoodFinder extends AppCompatActivity {
+    public static String json = "";
+    public static TextView t;
+    public static boolean authenticate = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_food_finder);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        LinearLayout ll = (LinearLayout) findViewById(R.id.ll);
+        ll.setOrientation(LinearLayout.VERTICAL);
+        final jsonParser jp = new jsonParser();
+
         setSupportActionBar(toolbar);
+        Button b = new Button(this);
+        b.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        b.setText("Press me to start server");
+        t = new TextView(this);
+        t.setText("HELLO UNIVERSE");
+        ll.addView(b);
+
+        ll.addView(t);
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                readAPI a = new readAPI(jp);
+                a.stopThread();
+                a.start();
+                //t.setText(a.JSONresponse);
+            }
+        });
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
