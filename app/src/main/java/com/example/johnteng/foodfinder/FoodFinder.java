@@ -7,43 +7,65 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
-
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.gson.stream.JsonReader;
 import com.ibm.watson.developer_cloud.personality_insights.v2.PersonalityInsights;
-import com.ibm.watson.developer_cloud.personality_insights.v2.model.Content;
 import com.ibm.watson.developer_cloud.personality_insights.v2.model.Profile;
-import com.ibm.watson.developer_cloud.personality_insights.v2.model.ProfileOptions;
-import com.ibm.watson.developer_cloud.util.GsonSingleton;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.List;
+
+import twitter4j.Paging;
+import twitter4j.Status;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.conf.ConfigurationBuilder;
+
+
 
 public class FoodFinder extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
 
     private GoogleApiClient googleApiClient;
     private static final int PERMISSION_ACCESS_COARSE_LOCATION = 1;
-    private EditText edLoc;
+    private EditText edLoc, edHandle;
     private Button btnFindMe;
     private double lat, lon;
     private String username, password, url;
+    private final String TWITTER_CONSUMER_KEY = "GBBRn1BcbWy6WHboV4t24N7In";
+    private final String TWITTER_CONSUMER_SECRET = "78AS0Dnj46pui9bxU4g2IXVI4vfsOcJ92fF0eoNtxCrD3UaL4g";
+    private final String TWITTER_ACCESS_TOKEN = "335657764-ja1g5iImHeEirRq6CO9BEZlRijbT3UBFb5Q8brBa";
+    private final String TWITTER_ACCESS_TOKEN_SECRET = "su3uqGtU3hyFHDrGtPBeRxWQkrfry8NVW4IlbVWBZ1KGk";
+    private int CASE;
+    public static boolean authenticate = true;
+    AlertDialog dialogBuilder;
+    public final jsonParser jp = new jsonParser();
+    JSONObject j = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_food_finder);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
         setSupportActionBar(toolbar);
+
 
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -58,6 +80,7 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
         googleApiClient = new GoogleApiClient.Builder(this, this, this).addApi(LocationServices.API).build();
 
         edLoc = (EditText) findViewById(R.id.edLoc);
+        edHandle = (EditText) findViewById(R.id.edHandle);
         btnFindMe = (Button) findViewById(R.id.btnFindMe);
 
         btnFindMe.setOnClickListener(new View.OnClickListener() {
@@ -77,12 +100,19 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Contacting Watson...", Snackbar.LENGTH_LONG).show();
-                new Thread(new Runnable() {
-                    public void run() {
-                        getPersonalityInsights();
-                    }
-                }).start();
+                if(edHandle.getText().length() != 0){
+                    Snackbar.make(view, "Contacting Watson...", Snackbar.LENGTH_LONG).show();
+                    new Thread(new Runnable() {
+                        public void run() {
+                            getTweets(edHandle.getText().toString());
+                        }
+                    }).start();
+                }else{
+                    makeToast(1);
+                }
+                if(CASE == 2){
+                    makeToast(2);
+                }
             }
         });
     }
@@ -137,35 +167,83 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_howto) {
+            howToDialog();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    public void getPersonalityInsights(){
+    public void getPersonalityInsights(String text){
         PersonalityInsights service = new PersonalityInsights();
         service.setUsernameAndPassword(username, password);
-
-        String text = "Call me Ishmael. Some years ago-never mind how long precisely-having "
-                + "little or no money in my purse, and nothing particular to interest me on shore, "
-                + "I thought I would sail about a little and see the watery part of the world. "
-                + "It is a way I have of driving off the spleen and regulating the circulation. "
-                + "Whenever I find myself growing grim about the mouth; whenever it is a damp, "
-                + "drizzly November in my soul; whenever I find myself involuntarily pausing before "
-                + "coffin warehouses, and bringing up the rear of every funeral I meet; and especially "
-                + "whenever my hypos get such an upper hand of me, that it requires a strong moral "
-                + "principle to prevent me from deliberately stepping into the street, and methodically "
-                + "knocking people's hats off-then, I account it high time to get to sea as soon as I can. "
-                + "This is my substitute for pistol and ball. With a philosophical flourish Cato throws himself "
-                + "upon his sword; I quietly take to the ship. There is nothing surprising in this. "
-                + "If they but knew it, almost all men in their degree, some time or other, cherish "
-                + "very nearly the same feelings towards the ocean with me. There now is your insular "
-                + "city of the Manhattoes, belted round by wharves as Indian isles by coral reefs-commerce surrounds "
-                + "it with her surf. Right and left, the streets take you waterward.";
-
+        try {
+            j = new JSONObject(text);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        jp.parseWatson(j);
         Profile profile = service.getProfile(text).execute();
         System.out.println(profile);
+    }
+
+    public void getTweets(String handle){
+        String text = "";
+        Paging paging = new Paging(1,100);
+        ConfigurationBuilder cb = new ConfigurationBuilder();
+        cb.setDebugEnabled(true)
+                .setOAuthConsumerKey(TWITTER_CONSUMER_KEY)
+                .setOAuthConsumerSecret(TWITTER_CONSUMER_SECRET)
+                .setOAuthAccessToken(TWITTER_ACCESS_TOKEN)
+                .setOAuthAccessTokenSecret(TWITTER_ACCESS_TOKEN_SECRET);
+        TwitterFactory tf = new TwitterFactory(cb.build());
+        Twitter twitter = tf.getInstance();
+        try {
+            List<Status> statuses;
+            String user;
+            user = handle;
+            statuses = twitter.getUserTimeline(user, paging);
+            Log.i("Status Count", statuses.size() + " Feeds");
+            for (int i = 0; i < statuses.size(); i++) {
+                Status status = statuses.get(i);
+                text += (status.getText());
+                Log.i("Tweet Count " + (i + 1), status.getText() + "\n\n");
+            }
+            if(text.length() != 0){
+                Log.d("Log","Outputting the JSON data");
+                getPersonalityInsights(text);
+            }else{
+                CASE = 2;
+            }
+        } catch (TwitterException te) {
+            te.printStackTrace();
+        }
+    }
+
+    public void makeToast(int CASE){
+        if(CASE == 1){
+            Toast.makeText(getApplicationContext(), "Please enter a Twitter handle", Toast.LENGTH_LONG).show();
+        }else if(CASE == 2){
+            Toast.makeText(getApplicationContext(), "I couldn't find any tweets!", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void howToDialog(){
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+        View calibrateView = layoutInflater.inflate(R.layout.how_it_works_layout, null);
+
+        dialogBuilder = new AlertDialog.Builder(this).create();
+        dialogBuilder.setView(calibrateView);
+
+        Button btnClose = (Button) calibrateView.findViewById(R.id.close);
+        btnClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialogBuilder.dismiss();
+            }
+        });
+
+        dialogBuilder.show();
     }
 }
