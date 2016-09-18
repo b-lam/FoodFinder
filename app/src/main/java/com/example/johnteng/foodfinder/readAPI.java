@@ -154,11 +154,6 @@ public class readAPI extends Thread {
         return result.toString();
     }
 
-
-    public void stopThread(){
-        this.interrupt();
-    }
-
     private void fillParameters () {
 
         searchParameters.add(new Pair("term", foodQuery.term));

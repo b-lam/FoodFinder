@@ -17,14 +17,16 @@ import org.json.JSONObject;
 public class jsonParser {
     public jsonParser () {
     }
-    public void parseWatson (JSONObject j) {
+    public void parseWatson (JSONObject j)  {
 
         JSONArray dataJsonArray = null;
         JSONArray dataJsonArray2 = null;
         JSONArray dataJsonArray3 = null;
 
+
         try {
-            dataJsonArray = j.getJSONArray("children");
+            JSONObject tree = j.getJSONObject("tree");
+            dataJsonArray = tree.getJSONArray("children");
             for (int i = 0; i < dataJsonArray.length(); i++) {
                 //Enter first array which selects either Big5, needs, values
 
@@ -35,10 +37,15 @@ public class jsonParser {
                 //Takes different action depending on whether Big5, needs, or values is currently selected
                 switch (ID) {
                     case ("personality")://Big5
-                        for (int k = 0; k<dataJsonArray2.length();k++){
-                            JSONObject dataObj2 = (JSONObject)dataJsonArray2.get(k);
-                            String id = dataObj2.getString("id");
-                            setBig5(id, dataObj2);
+                        Log.d("PERSONALITY","Personality branch is iterating");
+                        for (int x = 0; x<dataJsonArray2.length();x++){
+                            JSONObject dataObj2 = (JSONObject)dataJsonArray2.get(x);
+                            dataJsonArray3 = dataObj2.getJSONArray("children");
+                            for (int y = 0; y<dataJsonArray3.length();y++){
+                                JSONObject dataObj3 = (JSONObject)dataJsonArray3.get(y);
+                                String id = dataObj3.getString("id");
+                                setBig5(id, dataObj3);
+                            }
                         }
                         break;
                     case ("needs")://needs
@@ -137,18 +144,26 @@ private void setBig5 (String id, JSONObject dataObj2) throws JSONException {
     switch (id) {
         case ("Agreeableness"):
             personality.agreeableness = dataObj2.getDouble("percentage");
+            Log.d("BIG5",Double.toString(personality.agreeableness));
             break;
         case ("Conscientiousness"):
             personality.conscientiousness = dataObj2.getDouble("percentage");
+            Log.d("BIG5",Double.toString(personality.conscientiousness));
             break;
         case ("Extraversion"):
             personality.extraversion = dataObj2.getDouble("percentage");
+            Log.d("BIG5",Double.toString(personality.extraversion));
             break;
         case ("Openness"):
             personality.openness = dataObj2.getDouble("percentage");
+            Log.d("BIG5",Double.toString(personality.openness));
             break;
         case ("Neuroticism"):
             personality.emotionalRange = dataObj2.getDouble("percentage");
+            Log.d("BIG5",Double.toString(personality.emotionalRange));
+            break;
+        default:
+            Log.d("PERSONALITY","UNKNOWN VALUE FOUND");
             break;
     }
 }
@@ -157,6 +172,7 @@ private void setBig5 (String id, JSONObject dataObj2) throws JSONException {
         switch (id){
             case ("Conservation"):
                 personality.tradition = dataObj3.getDouble("percentage");
+                Log.d("VALUES",Double.toString(personality.tradition));
                 break;
             case ("Openness to change"):
                 personality.opennessToChange = dataObj3.getDouble("percentage");
@@ -177,6 +193,7 @@ private void setBig5 (String id, JSONObject dataObj2) throws JSONException {
         switch (id) {
             case "Challenge":
                 personality.challenge = dataObj3.getDouble("percentage");
+                Log.d("NEEDS",Double.toString(personality.challenge));
                 break;
             case "Closeness":
                 personality.closeness = dataObj3.getDouble("percentage");

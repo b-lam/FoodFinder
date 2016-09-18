@@ -203,14 +203,17 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
     public void getPersonalityInsights(String text){
         PersonalityInsights service = new PersonalityInsights();
         service.setUsernameAndPassword(username, password);
+
+        Profile profile = service.getProfile(text).execute();
+
         try {
-            j = new JSONObject(text);
+            j = new JSONObject(profile.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
         jp.parseWatson(j);
-        Profile profile = service.getProfile(text).execute();
-        System.out.println(profile);
+        System.out.println(profile.toString());
     }
 
     public void getTweets(String handle){
