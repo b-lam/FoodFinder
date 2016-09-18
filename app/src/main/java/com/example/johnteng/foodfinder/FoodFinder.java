@@ -29,14 +29,10 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.ibm.watson.developer_cloud.personality_insights.v2.PersonalityInsights;
 import com.ibm.watson.developer_cloud.personality_insights.v2.model.Profile;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
-
 import java.io.InputStream;
 import java.util.List;
-
 import twitter4j.Paging;
 import twitter4j.Status;
 import twitter4j.Twitter;
@@ -96,6 +92,8 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
         TextView tvAddress = (TextView) findViewById(R.id.tvAddress);
         TextView tvTelephone = (TextView) findViewById(R.id.tvTelephone);
         ImageView imgBusiness = (ImageView) findViewById(R.id.imgBusiness);
+
+        ComputationalMatrix computationalMatrix = new ComputationalMatrix();
 
         new DownloadImageTask(imgBusiness).execute("https://s3-media1.fl.yelpcdn.com/bphoto/HENovrpv3Uh0M6UONHT2XA/ms.jpg");
 

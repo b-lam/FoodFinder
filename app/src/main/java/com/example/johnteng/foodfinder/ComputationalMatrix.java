@@ -97,35 +97,33 @@ public class ComputationalMatrix {
                 hashmap.get("Open to change");
     }
 
-    public String  calculateStandardForPrice(HashMap<String, Double> bb){
+    public void calculateStandardForPrice(HashMap<String, Double> bb){
         double standard = returnCalculationFactor(bb)/maxGenerator(bb);
         if(0<standard || standard<30){
-            return "1,2"; //John might not be able to parse this kind of format, need to check
+            foodQuery.price = "1,2";
         }
 
         else if(30<standard || standard<70){
-            return "1,2,3";
+            foodQuery.price = "1,2,3";
         }
 
         else if(30<standard || standard<70) {
-            return "1,2,3,4";
+            foodQuery.price = "1,2,3,4";
         }
-        return "1,2,3,4";   // this case is actually error
     }
 
-    public Integer  calculateStandardForRadius(HashMap<String, Double> bb){
-        double standar = returnCalculationFactor(bb)/maxGenerator(bb);
-        if(0<standar || standar<30){
-            return 1000; //John might not be able to parse this kind of format, need to check
+    public void calculateStandardForRadius(HashMap<String, Double> bb){
+        double standard = returnCalculationFactor(bb)/maxGenerator(bb);
+        if(0<standard || standard<30){
+            foodQuery.radius = 1000;
         }
 
-        else if(30<standar || standar<70){
-            return 5000;
+        else if(30<standard || standard<70){
+            foodQuery.radius = 1000;
         }
 
-        else if(30<standar || standar<70) {
-            return 10000;
+        else if(30<standard || standard<70) {
+            foodQuery.radius = 1000;
         }
-        return 0;   // this case is actually error
     }
 }
