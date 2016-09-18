@@ -7,16 +7,17 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -52,6 +53,7 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
     private final String TWITTER_ACCESS_TOKEN = "335657764-ja1g5iImHeEirRq6CO9BEZlRijbT3UBFb5Q8brBa";
     private final String TWITTER_ACCESS_TOKEN_SECRET = "su3uqGtU3hyFHDrGtPBeRxWQkrfry8NVW4IlbVWBZ1KGk";
     private int CASE;
+    AlertDialog dialogBuilder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,7 +162,8 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_howto) {
+            howToDialog();
             return true;
         }
 
@@ -177,7 +180,7 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
 
     public void getTweets(String handle){
         String text = "";
-        Paging paging = new Paging(1,50);
+        Paging paging = new Paging(1,100);
         ConfigurationBuilder cb = new ConfigurationBuilder();
         cb.setDebugEnabled(true)
                 .setOAuthConsumerKey(TWITTER_CONSUMER_KEY)
@@ -191,12 +194,11 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
             String user;
             user = handle;
             statuses = twitter.getUserTimeline(user, paging);
-//            Log.i("Status Count", statuses.size() + " Feeds");
+            Log.i("Status Count", statuses.size() + " Feeds");
             for (int i = 0; i < statuses.size(); i++) {
                 Status status = statuses.get(i);
-                text = (status.getText());
-                System.out.println(text);
-//                Log.i("Tweet Count " + (i + 1), status.getText() + "\n\n");
+                text += (status.getText());
+                Log.i("Tweet Count " + (i + 1), status.getText() + "\n\n");
             }
             if(text.length() != 0){
                 getPersonalityInsights(text);
@@ -214,5 +216,23 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
         }else if(CASE == 2){
             Toast.makeText(getApplicationContext(), "I couldn't find any tweets!", Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void howToDialog(){
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+        View calibrateView = layoutInflater.inflate(R.layout.how_it_works_layout, null);
+
+        dialogBuilder = new AlertDialog.Builder(this).create();
+        dialogBuilder.setView(calibrateView);
+
+        Button btnClose = (Button) calibrateView.findViewById(R.id.close);
+        btnClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialogBuilder.dismiss();
+            }
+        });
+
+        dialogBuilder.show();
     }
 }
