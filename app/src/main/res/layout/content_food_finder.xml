@@ -33,7 +33,7 @@
             <EditText
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/editText"
+                android:id="@+id/edHandle"
                 android:hint="\@justinbieber"
                 android:textSize="14dp" />
         </LinearLayout>
