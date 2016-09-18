@@ -14,10 +14,10 @@ public class ComputationalMatrix {
     HashMap<String, Double> radiusMap = new HashMap<>();
 
     public ComputationalMatrix(){
-        populateHashmap(priceMap, 0, 0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0, 0, 0);
-        populateHashmap(ratingMap, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0, 0, 0);
-        populateHashmap(reviewsMap, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0, 0, 0);
-        populateHashmap(radiusMap, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0, 0, 0);
+        populateHashmap(priceMap, 0, 0.25, 0, 0, 0, 0, 0, 0, 0.25, 0, 0, 0.25, 0, 0, 0, 0, 0, 0 ,0 ,0.25, 0, 0);
+        populateHashmap(ratingMap, 0, 0, 0, 0, 0, 0, 0, 0, 0.333, 0, 0, 0, 0, 0, 0.333, 0, 0, 0 ,0 ,0.333, 0, 0);
+        populateHashmap(reviewsMap, 0, 0, 0.333, 0, 0, 0.333, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0, 0, 0.333);
+        populateHashmap(radiusMap, 0, 0, 0.167, 0, 0.167, 0, 0, 0.167, 0, 0, 0, 0.167, 0, 0, 0, 0.167, 0, 0 ,0 ,0, 0, 0.167);
     }
 
     public void populateHashmap(HashMap<String, Double> hashmap, double a, double b, double c, double d, double e, double f, double g, double h, double i, double j, double k, double l, double m, double n, double o, double p, double q, double r, double s, double t, double u, double v){
@@ -42,7 +42,7 @@ public class ComputationalMatrix {
         hashmap.put("Tradition", s);
         hashmap.put("Hedonism", t);
         hashmap.put("Achieving success", u);
-        hashmap.put("Excitement", v);
+        hashmap.put("Open to change", v);
     }
 
     public double returnCalculationFactor(HashMap<String, Double> bb){
