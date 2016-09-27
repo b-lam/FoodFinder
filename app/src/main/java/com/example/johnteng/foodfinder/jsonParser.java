@@ -32,8 +32,8 @@ public class jsonParser {
                 String ID = dataObj.getString("id");
                 //Takes different action depending on whether Big5, needs, or values is currently selected
                 switch (ID) {
-                    case ("Personality")://Big5
-                        Log.d("PERSONALITY","Personality branch is iterating");
+                    case ("personality")://Big5
+                        Log.d("PERSONALITY","PersonalityInsights branch is iterating");
                         for (int x = 0; x<dataJsonArray2.length();x++){
                             JSONObject dataObj2 = (JSONObject)dataJsonArray2.get(x);
                             dataJsonArray3 = dataObj2.getJSONArray("children");
@@ -75,27 +75,27 @@ public class jsonParser {
         }
     }
 
-private void setBig5 (String id, JSONObject dataObj2) throws JSONException {
+private void setBig5 (String id, JSONObject dataObj3) throws JSONException {
     switch (id) {
         case ("Agreeableness"):
-            Personality.agreeableness = dataObj2.getDouble("percentage");
-            Log.d("BIG5",Double.toString(Personality.agreeableness));
+            PersonalityInsights.agreeableness = dataObj3.getDouble("percentage");
+            Log.d("BIG5",Double.toString(PersonalityInsights.agreeableness));
             break;
         case ("Conscientiousness"):
-            Personality.conscientiousness = dataObj2.getDouble("percentage");
-            Log.d("BIG5",Double.toString(Personality.conscientiousness));
+            PersonalityInsights.conscientiousness = dataObj3.getDouble("percentage");
+            Log.d("BIG5",Double.toString(PersonalityInsights.conscientiousness));
             break;
         case ("Extraversion"):
-            Personality.extraversion = dataObj2.getDouble("percentage");
-            Log.d("BIG5",Double.toString(Personality.extraversion));
+            PersonalityInsights.extraversion = dataObj3.getDouble("percentage");
+            Log.d("BIG5",Double.toString(PersonalityInsights.extraversion));
             break;
         case ("Openness"):
-            Personality.openness = dataObj2.getDouble("percentage");
-            Log.d("BIG5",Double.toString(Personality.openness));
+            PersonalityInsights.openness = dataObj3.getDouble("percentage");
+            Log.d("BIG5",Double.toString(PersonalityInsights.openness));
             break;
         case ("Neuroticism"):
-            Personality.emotionalRange = dataObj2.getDouble("percentage");
-            Log.d("BIG5",Double.toString(Personality.emotionalRange));
+            PersonalityInsights.emotionalRange = dataObj3.getDouble("percentage");
+            Log.d("BIG5",Double.toString(PersonalityInsights.emotionalRange));
             break;
         default:
             Log.d("PERSONALITY","UNKNOWN VALUE FOUND");
@@ -106,20 +106,20 @@ private void setBig5 (String id, JSONObject dataObj2) throws JSONException {
     private void setValues (String id, JSONObject dataObj3) throws JSONException {
         switch (id){
             case ("Conservation"):
-                Personality.tradition = dataObj3.getDouble("percentage");
-                Log.d("VALUES",Double.toString(Personality.tradition));
+                PersonalityInsights.tradition = dataObj3.getDouble("percentage");
+                Log.d("VALUES",Double.toString(PersonalityInsights.tradition));
                 break;
             case ("Openness to change"):
-                Personality.opennessToChange = dataObj3.getDouble("percentage");
+                PersonalityInsights.opennessToChange = dataObj3.getDouble("percentage");
                 break;
             case ("Hedonism"):
-                Personality.hedonism = dataObj3.getDouble("percentage");
+                PersonalityInsights.hedonism = dataObj3.getDouble("percentage");
                 break;
             case ("Self-enhancement"):
-                Personality.achievingSuccess = dataObj3.getDouble("percentage");
+                PersonalityInsights.achievingSuccess = dataObj3.getDouble("percentage");
                 break;
             case ("Self-transcendence"):
-                Personality.helpingOthers = dataObj3.getDouble("percentage");
+                PersonalityInsights.helpingOthers = dataObj3.getDouble("percentage");
                 break;
         }
     }
@@ -127,41 +127,41 @@ private void setBig5 (String id, JSONObject dataObj2) throws JSONException {
     private void setNeeds (String id, JSONObject dataObj3) throws JSONException {
         switch (id) {
             case "Challenge":
-                Personality.challenge = dataObj3.getDouble("percentage");
-                Log.d("NEEDS",Double.toString(Personality.challenge));
+                PersonalityInsights.challenge = dataObj3.getDouble("percentage");
+                Log.d("NEEDS",Double.toString(PersonalityInsights.challenge));
                 break;
             case "Closeness":
-                Personality.closeness = dataObj3.getDouble("percentage");
+                PersonalityInsights.closeness = dataObj3.getDouble("percentage");
                 break;
             case "Curiosity":
-                Personality.curiosity = dataObj3.getDouble("percentage");
+                PersonalityInsights.curiosity = dataObj3.getDouble("percentage");
                 break;
             case "Excitement":
-                Personality.excitement = dataObj3.getDouble("percentage");
+                PersonalityInsights.excitement = dataObj3.getDouble("percentage");
                 break;
             case "Harmony":
-                Personality.harmony = dataObj3.getDouble("percentage");
+                PersonalityInsights.harmony = dataObj3.getDouble("percentage");
                 break;
             case "Ideal":
-                Personality.ideal = dataObj3.getDouble("percentage");
+                PersonalityInsights.ideal = dataObj3.getDouble("percentage");
                 break;
             case "Liberty":
-                Personality.liberty = dataObj3.getDouble("percentage");
+                PersonalityInsights.liberty = dataObj3.getDouble("percentage");
                 break;
             case "Love":
-                Personality.love = dataObj3.getDouble("percentage");
+                PersonalityInsights.love = dataObj3.getDouble("percentage");
                 break;
             case "Practicality":
-                Personality.practicality = dataObj3.getDouble("percentage");
+                PersonalityInsights.practicality = dataObj3.getDouble("percentage");
                 break;
             case "Self-expression":
-                Personality.selfExpression = dataObj3.getDouble("percentage");
+                PersonalityInsights.selfExpression = dataObj3.getDouble("percentage");
                 break;
             case "Stability":
-                Personality.stability = dataObj3.getDouble("percentage");
+                PersonalityInsights.stability = dataObj3.getDouble("percentage");
                 break;
             case "Structure":
-                Personality.structure = dataObj3.getDouble("percentage");
+                PersonalityInsights.structure = dataObj3.getDouble("percentage");
                 break;
         }
     }

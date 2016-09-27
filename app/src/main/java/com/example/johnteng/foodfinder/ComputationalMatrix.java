@@ -9,7 +9,6 @@ import java.util.HashMap;
  * Created by Brandon on 9/18/2016.
  */
 public class ComputationalMatrix {
-    private Personality p ;
 
     static public HashMap<String, Double> priceMap = new HashMap<>();
     static public HashMap<String, Double> ratingMap = new HashMap<>();
@@ -49,28 +48,28 @@ public class ComputationalMatrix {
     }
 
     public double returnCalculationFactor(HashMap<String, Double> hashmap){
-        return   hashmap.get("Agreeableness")*p.agreeableness+
-                hashmap.get("Conscientiousness")*p.conscientiousness+
-                hashmap.get("Extraversion")*p.extraversion+
-                hashmap.get("Emotional Range")*p.emotionalRange+
-                hashmap.get("Openness")*p.openness+
-                hashmap.get("Excitement")*p.excitement+
-                hashmap.get("Harmony")*p.harmony+
-                hashmap.get("Curiosity")*p.curiosity+
-                hashmap.get("Ideal")*p.ideal+
-                hashmap.get("Closeness")*p.closeness+
-                hashmap.get("Self-expression")*p.selfExpression+
-                hashmap.get("Liberty")*p.liberty+
-                hashmap.get("Love")*p.love+
-                hashmap.get("Practicality")*p.practicality+
-                hashmap.get("Stability")*p.stability+
-                hashmap.get("Challenge")*p.challenge+
-                hashmap.get("Structure")*p.structure+
-                hashmap.get("Helping others")*p.helpingOthers+
-                hashmap.get("Tradition")*p.tradition+
-                hashmap.get("Hedonism")*p.hedonism+
-                hashmap.get("Achieving success")*p.achievingSuccess+
-                hashmap.get("Open to change")*p.opennessToChange;
+        return   hashmap.get("Agreeableness")* PersonalityInsights.agreeableness+
+                hashmap.get("Conscientiousness")* PersonalityInsights.conscientiousness+
+                hashmap.get("Extraversion")* PersonalityInsights.extraversion+
+                hashmap.get("Emotional Range")* PersonalityInsights.emotionalRange+
+                hashmap.get("Openness")* PersonalityInsights.openness+
+                hashmap.get("Excitement")* PersonalityInsights.excitement+
+                hashmap.get("Harmony")* PersonalityInsights.harmony+
+                hashmap.get("Curiosity")* PersonalityInsights.curiosity+
+                hashmap.get("Ideal")* PersonalityInsights.ideal+
+                hashmap.get("Closeness")* PersonalityInsights.closeness+
+                hashmap.get("Self-expression")* PersonalityInsights.selfExpression+
+                hashmap.get("Liberty")* PersonalityInsights.liberty+
+                hashmap.get("Love")* PersonalityInsights.love+
+                hashmap.get("Practicality")* PersonalityInsights.practicality+
+                hashmap.get("Stability")* PersonalityInsights.stability+
+                hashmap.get("Challenge")* PersonalityInsights.challenge+
+                hashmap.get("Structure")* PersonalityInsights.structure+
+                hashmap.get("Helping others")* PersonalityInsights.helpingOthers+
+                hashmap.get("Tradition")* PersonalityInsights.tradition+
+                hashmap.get("Hedonism")* PersonalityInsights.hedonism+
+                hashmap.get("Achieving success")* PersonalityInsights.achievingSuccess+
+                hashmap.get("Open to change")* PersonalityInsights.opennessToChange;
 
     }
 
@@ -100,34 +99,42 @@ public class ComputationalMatrix {
     }
 
     public void calculateStandardForPrice(HashMap<String, Double> bb){
-        double standard = returnCalculationFactor(bb)/maxGenerator(bb);
+        double standard = (returnCalculationFactor(bb)/maxGenerator(bb))*100;
         Log.d("Matrix Price", String.valueOf(standard));
-        if(0<standard || standard<30){
+        if(standard>=0 && standard<25){
             BusinessSearch.price = "1,2";
         }
 
-        else if(30<standard || standard<70){
+        else if(standard>=25 && standard<50){
             BusinessSearch.price = "1,2,3";
         }
 
-        else if(30<standard || standard<70) {
+        else if(standard>=50 && standard<100) {
             BusinessSearch.price = "1,2,3,4";
         }
     }
 
     public void calculateStandardForRadius(HashMap<String, Double> bb){
-        double standard = returnCalculationFactor(bb)/maxGenerator(bb);
+        double standard = (returnCalculationFactor(bb)/maxGenerator(bb))*100;
         Log.d("Matrix Radius", String.valueOf(standard));
-        if(0<standard || standard<30){
+        if(standard>=0 && standard<25){
             BusinessSearch.radius = 1000;
         }
 
-        else if(30<standard || standard<70){
+        else if(standard>=25 && standard<50){
             BusinessSearch.radius = 5000;
         }
 
-        else if(30<standard || standard<70) {
+        else if(standard>=50 && standard<100) {
             BusinessSearch.radius = 10000;
         }
+    }
+
+    public double calculateStandardForRatings(HashMap<String, Double> bb){
+        return (returnCalculationFactor(bb)/maxGenerator(bb))*100;
+    }
+
+    public double calculateStandardForReviews(HashMap<String, Double> bb){
+        return (returnCalculationFactor(bb)/maxGenerator(bb))*100;
     }
 }

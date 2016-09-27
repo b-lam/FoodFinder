@@ -1,5 +1,6 @@
 package com.example.johnteng.foodfinder;
 
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -36,7 +37,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.util.List;
 
 import okhttp3.OkHttpClient;
@@ -83,7 +88,7 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
                     PERMISSION_ACCESS_COARSE_LOCATION);
         }
 
-        url = "https://gateway.watsonplatform.net/Personality-insights/api";
+        url = "https://gateway.watsonplatform.net/PersonalityInsights-insights/api";
         username = "c710423e-c611-434f-89d3-aa4e0ce1f503";
         password = "sDQqS0Kjdp74";
 
@@ -215,11 +220,27 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
         jp.parseWatson(j);
         System.out.println(profile.toString());
 
+        try{
+            writeToFile(profile.toString(), this);
+        }catch (IOException e){
+
+        }
+
         computationalMatrix.calculateStandardForPrice(computationalMatrix.priceMap);
         computationalMatrix.calculateStandardForRadius(computationalMatrix.radiusMap);
+        double rating = computationalMatrix.calculateStandardForRatings(computationalMatrix.ratingMap);
+        double review_count = computationalMatrix.calculateStandardForReviews(computationalMatrix.reviewsMap);
+        Log.d("Yelp", String.valueOf(rating) + ", " + String.valueOf(review_count));
         BusinessSearch.term = "food";
         BusinessSearch.limit = 1;
-        BusinessSearch.sort_by = "best_match";
+        if(rating > review_count && Math.abs(rating-review_count) > 10){
+            BusinessSearch.sort_by = "rating";
+        }else if(review_count > rating && Math.abs(rating-review_count) > 10){
+            BusinessSearch.sort_by = "review_count";
+        }else{
+            BusinessSearch.sort_by = "best_match";
+        }
+        Log.d("Yelp Sort By", BusinessSearch.sort_by);
         BusinessSearch.open_now = true;
         yelp.businessSearch();
         yelp.setListener(new Callback<Void>() {
@@ -321,6 +342,21 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
 
         protected void onPostExecute(Bitmap result) {
             bmImage.setImageBitmap(result);
+        }
+    }
+
+    private void writeToFile(String data,Context context) throws IOException {
+        File path = context.getExternalFilesDir(null);
+        File file = new File(path, "json.txt");
+
+        FileOutputStream stream = new FileOutputStream(file);
+        try {
+            Log.d("Print", "Writing to file");
+            stream.write(data.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            stream.close();
         }
     }
 }
