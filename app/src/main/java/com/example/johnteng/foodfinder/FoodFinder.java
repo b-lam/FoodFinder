@@ -37,6 +37,8 @@ import org.w3c.dom.Text;
 import java.io.InputStream;
 import java.util.List;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import twitter4j.Paging;
 import twitter4j.Status;
 import twitter4j.Twitter;
@@ -59,11 +61,10 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
     private final String TWITTER_ACCESS_TOKEN = "335657764-ja1g5iImHeEirRq6CO9BEZlRijbT3UBFb5Q8brBa";
     private final String TWITTER_ACCESS_TOKEN_SECRET = "su3uqGtU3hyFHDrGtPBeRxWQkrfry8NVW4IlbVWBZ1KGk";
     private int CASE;
-    public static boolean authenticate = true;
     AlertDialog dialogBuilder;
     public final jsonParser jp = new jsonParser();
     JSONObject j = null;
-    readAPI r;
+    Yelp yelp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,9 +81,12 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
                     PERMISSION_ACCESS_COARSE_LOCATION);
         }
 
-        url = "https://gateway.watsonplatform.net/personality-insights/api";
+        url = "https://gateway.watsonplatform.net/Personality-insights/api";
         username = "c710423e-c611-434f-89d3-aa4e0ce1f503";
         password = "sDQqS0Kjdp74";
+
+        yelp = new Yelp(this);
+        yelp.authenticate();
 
         googleApiClient = new GoogleApiClient.Builder(this, this, this).addApi(LocationServices.API).build();
 
@@ -90,23 +94,14 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
         edHandle = (EditText) findViewById(R.id.edHandle);
         btnFindMe = (Button) findViewById(R.id.btnFindMe);
 
-        TextView tvName = (TextView) findViewById(R.id.tvName);
-        TextView tvURL = (TextView) findViewById(R.id.tvURL);
-        TextView tvPrice = (TextView) findViewById(R.id.tvPrice);
-        TextView tvAddress = (TextView) findViewById(R.id.tvAddress);
-        TextView tvTelephone = (TextView) findViewById(R.id.tvTelephone);
-        ImageView imgBusiness = (ImageView) findViewById(R.id.imgBusiness);
+        final TextView tvName = (TextView) findViewById(R.id.tvName);
+        final TextView tvURL = (TextView) findViewById(R.id.tvURL);
+        final TextView tvPrice = (TextView) findViewById(R.id.tvPrice);
+        final TextView tvAddress = (TextView) findViewById(R.id.tvAddress);
+        final TextView tvTelephone = (TextView) findViewById(R.id.tvTelephone);
+        final ImageView imgBusiness = (ImageView) findViewById(R.id.imgBusiness);
 
-        new DownloadImageTask(imgBusiness).execute("https://s3-media1.fl.yelpcdn.com/bphoto/HENovrpv3Uh0M6UONHT2XA/ms.jpg");
-
-        r = new readAPI(new jsonParser());
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                r.run();
-            }
-        }).start();
+        final ComputationalMatrix computationalMatrix = new ComputationalMatrix();
 
         btnFindMe.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,6 +112,8 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
                     lat = lastLocation.getLatitude();
                     lon = lastLocation.getLongitude();
                     edLoc.setText("(" + lat + ", " + lon + ")");
+                    BusinessSearch.latitude = lat;
+                    BusinessSearch.longitude = lon;
                 }
             }
         });
@@ -132,6 +129,19 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
                             getTweets(edHandle.getText().toString());
                         }
                     }).start();
+                    computationalMatrix.calculateStandardForPrice(computationalMatrix.priceMap);
+                    computationalMatrix.calculateStandardForRadius(computationalMatrix.radiusMap);
+                    BusinessSearch.term = "food";
+                    BusinessSearch.limit = 1;
+                    BusinessSearch.sort_by = "best_match";
+                    BusinessSearch.open_now = true;
+                    yelp.businessSearch();
+                    tvName.setText("Name: " + SearchResponse.name);
+                    tvPrice.setText("Price: " + SearchResponse.price);
+                    tvAddress.setText("Address: " + SearchResponse.location);
+                    tvTelephone.setText("Telephone: " + SearchResponse.phone);
+                    tvURL.setText("Website: " + SearchResponse.url);
+//                    new DownloadImageTask(imgBusiness).execute(SearchResponse.image_url);
                 }else{
                     makeToast(1);
                 }
@@ -213,7 +223,7 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
         }
 
         jp.parseWatson(j);
-        System.out.println(profile.toString());
+//        System.out.println(profile.toString());
     }
 
     public void getTweets(String handle){
@@ -232,11 +242,11 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
             String user;
             user = handle;
             statuses = twitter.getUserTimeline(user, paging);
-            Log.i("Status Count", statuses.size() + " Feeds");
+//            Log.i("Status Count", statuses.size() + " Feeds");
             for (int i = 0; i < statuses.size(); i++) {
                 Status status = statuses.get(i);
                 text += (status.getText());
-                Log.i("Tweet Count " + (i + 1), status.getText() + "\n\n");
+//                Log.i("Tweet Count " + (i + 1), status.getText() + "\n\n");
             }
             if(text.length() != 0){
                 Log.d("Log","Outputting the JSON data");
