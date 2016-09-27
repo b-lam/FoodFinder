@@ -1,6 +1,8 @@
 package com.example.johnteng.foodfinder;
 
 
+import android.util.Log;
+
 import java.util.HashMap;
 
 /**
@@ -99,6 +101,7 @@ public class ComputationalMatrix {
 
     public void calculateStandardForPrice(HashMap<String, Double> bb){
         double standard = returnCalculationFactor(bb)/maxGenerator(bb);
+        Log.d("Matrix Price", String.valueOf(standard));
         if(0<standard || standard<30){
             BusinessSearch.price = "1,2";
         }
@@ -114,6 +117,7 @@ public class ComputationalMatrix {
 
     public void calculateStandardForRadius(HashMap<String, Double> bb){
         double standard = returnCalculationFactor(bb)/maxGenerator(bb);
+        Log.d("Matrix Radius", String.valueOf(standard));
         if(0<standard || standard<30){
             BusinessSearch.radius = 1000;
         }

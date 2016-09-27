@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -94,15 +96,6 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
         edHandle = (EditText) findViewById(R.id.edHandle);
         btnFindMe = (Button) findViewById(R.id.btnFindMe);
 
-        final TextView tvName = (TextView) findViewById(R.id.tvName);
-        final TextView tvURL = (TextView) findViewById(R.id.tvURL);
-        final TextView tvPrice = (TextView) findViewById(R.id.tvPrice);
-        final TextView tvAddress = (TextView) findViewById(R.id.tvAddress);
-        final TextView tvTelephone = (TextView) findViewById(R.id.tvTelephone);
-        final ImageView imgBusiness = (ImageView) findViewById(R.id.imgBusiness);
-
-        final ComputationalMatrix computationalMatrix = new ComputationalMatrix();
-
         btnFindMe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -129,19 +122,6 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
                             getTweets(edHandle.getText().toString());
                         }
                     }).start();
-                    computationalMatrix.calculateStandardForPrice(computationalMatrix.priceMap);
-                    computationalMatrix.calculateStandardForRadius(computationalMatrix.radiusMap);
-                    BusinessSearch.term = "food";
-                    BusinessSearch.limit = 1;
-                    BusinessSearch.sort_by = "best_match";
-                    BusinessSearch.open_now = true;
-                    yelp.businessSearch();
-                    tvName.setText("Name: " + SearchResponse.name);
-                    tvPrice.setText("Price: " + SearchResponse.price);
-                    tvAddress.setText("Address: " + SearchResponse.location);
-                    tvTelephone.setText("Telephone: " + SearchResponse.phone);
-                    tvURL.setText("Website: " + SearchResponse.url);
-//                    new DownloadImageTask(imgBusiness).execute(SearchResponse.image_url);
                 }else{
                     makeToast(1);
                 }
@@ -211,6 +191,16 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
     }
 
     public void getPersonalityInsights(String text){
+
+        final TextView tvName = (TextView) findViewById(R.id.tvName);
+        final TextView tvURL = (TextView) findViewById(R.id.tvURL);
+        final TextView tvPrice = (TextView) findViewById(R.id.tvPrice);
+        final TextView tvAddress = (TextView) findViewById(R.id.tvAddress);
+        final TextView tvTelephone = (TextView) findViewById(R.id.tvTelephone);
+        final ImageView imgBusiness = (ImageView) findViewById(R.id.imgBusiness);
+
+        final ComputationalMatrix computationalMatrix = new ComputationalMatrix();
+
         PersonalityInsights service = new PersonalityInsights();
         service.setUsernameAndPassword(username, password);
 
@@ -223,7 +213,31 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
         }
 
         jp.parseWatson(j);
-//        System.out.println(profile.toString());
+        System.out.println(profile.toString());
+
+        computationalMatrix.calculateStandardForPrice(computationalMatrix.priceMap);
+        computationalMatrix.calculateStandardForRadius(computationalMatrix.radiusMap);
+        BusinessSearch.term = "food";
+        BusinessSearch.limit = 1;
+        BusinessSearch.sort_by = "best_match";
+        BusinessSearch.open_now = true;
+        yelp.businessSearch();
+        yelp.setListener(new Callback<Void>() {
+            @Override
+            public void onResult(Void result) {
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        tvName.setText("Name: " + SearchResponse.name);
+                        tvPrice.setText("Price: " + SearchResponse.price);
+                        tvAddress.setText("Address: " + SearchResponse.location);
+                        tvTelephone.setText("Telephone: " + SearchResponse.phone);
+                        tvURL.setText("Website: " + SearchResponse.url);
+                        new DownloadImageTask(imgBusiness).execute(SearchResponse.image_url);
+                    }
+                });
+            }
+        });
     }
 
     public void getTweets(String handle){
@@ -242,11 +256,11 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
             String user;
             user = handle;
             statuses = twitter.getUserTimeline(user, paging);
-//            Log.i("Status Count", statuses.size() + " Feeds");
+            Log.i("Status Count", statuses.size() + " Feeds");
             for (int i = 0; i < statuses.size(); i++) {
                 Status status = statuses.get(i);
                 text += (status.getText());
-//                Log.i("Tweet Count " + (i + 1), status.getText() + "\n\n");
+                Log.i("Tweet Count " + (i + 1), status.getText() + "\n\n");
             }
             if(text.length() != 0){
                 Log.d("Log","Outputting the JSON data");

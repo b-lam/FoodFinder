@@ -10,7 +10,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -27,7 +26,11 @@ public class Yelp {
     String client_secret;
     String access_token;
     static OkHttpClient client = new OkHttpClient();
+    private com.example.johnteng.foodfinder.Callback<Void> mListener;
 
+    public void setListener(com.example.johnteng.foodfinder.Callback<Void> listener) {
+        mListener = listener;
+    }
 
     public Yelp(Context context){
         client_id = context.getResources().getString(R.string.yelp_client_id);
@@ -47,7 +50,7 @@ public class Yelp {
                 .post(requestBody)
                 .build();
 
-        client.newCall(request).enqueue(new Callback() {
+        client.newCall(request).enqueue(new okhttp3.Callback() {
             @Override
             public void onResponse(Call call, final Response response) throws IOException {
                 if (!response.isSuccessful()) {
@@ -96,7 +99,7 @@ public class Yelp {
 
         Log.d("Yelp", request.toString());
 
-        client.newCall(request).enqueue(new Callback() {
+        client.newCall(request).enqueue(new okhttp3.Callback() {
             @Override
             public void onResponse(Call call, final Response response) throws IOException {
                 if (!response.isSuccessful()) {
@@ -107,13 +110,14 @@ public class Yelp {
                         JSONObject json = new JSONObject(responseData);
                         JSONArray businesses = json.getJSONArray("businesses");
                         JSONObject business = (JSONObject)businesses.get(0);
+                        JSONObject location = business.getJSONObject("location");
                         SearchResponse.name = business.getString("name");
                         SearchResponse.price = business.getString("price");
 //                        JSONArray location = business.getJSONArray("location");
 //                        JSONObject address = location.getJSONObject(0);
-                        SearchResponse.location = business.getString("location");
+                        SearchResponse.location = location.getString("address1") + ",  " + location.getString("city") + ", " + location.getString("zip_code");
                         SearchResponse.phone = business.getString("phone");
-                        SearchResponse.url = business.getString("url");
+                        SearchResponse.url = "yelp.com";
                         SearchResponse.image_url = business.getString("image_url");
 
                         Log.d("Yelp", SearchResponse.name);
@@ -124,8 +128,13 @@ public class Yelp {
                         Log.d("Yelp", SearchResponse.image_url);
 
                         Log.d("Yelp", json.toString());
-                    } catch (JSONException e) {
 
+                        if (mListener != null) {
+                            mListener.onResult(null);
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
                 }
             }
