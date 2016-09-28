@@ -113,11 +113,9 @@ public class Yelp {
                         JSONObject location = business.getJSONObject("location");
                         SearchResponse.name = business.getString("name");
                         SearchResponse.price = business.getString("price");
-//                        JSONArray location = business.getJSONArray("location");
-//                        JSONObject address = location.getJSONObject(0);
                         SearchResponse.location = location.getString("address1") + ",  " + location.getString("city") + ", " + location.getString("zip_code");
                         SearchResponse.phone = business.getString("phone");
-                        SearchResponse.url = "yelp.com";
+                        SearchResponse.url = business.getString("url");
                         SearchResponse.image_url = business.getString("image_url");
 
                         Log.d("Yelp", SearchResponse.name);

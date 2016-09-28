@@ -16,6 +16,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +26,6 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
@@ -32,20 +33,13 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.ibm.watson.developer_cloud.personality_insights.v2.PersonalityInsights;
 import com.ibm.watson.developer_cloud.personality_insights.v2.model.Profile;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.util.List;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import twitter4j.Paging;
 import twitter4j.Status;
 import twitter4j.Twitter;
@@ -59,7 +53,7 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
 
     private GoogleApiClient googleApiClient;
     private static final int PERMISSION_ACCESS_COARSE_LOCATION = 1;
-    private EditText edLoc, edHandle;
+    private EditText edHandle;
     private Button btnFindMe;
     private double lat, lon;
     private String username, password, url;
@@ -70,8 +64,9 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
     private int CASE;
     AlertDialog dialogBuilder;
     public final jsonParser jp = new jsonParser();
-    JSONObject j = null;
     Yelp yelp;
+    TextView tvCoord, tvName, tvURL, tvPrice, tvAddress, tvTelephone;
+    ImageView imgBusiness;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +75,6 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         setSupportActionBar(toolbar);
-
 
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -97,9 +91,19 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
 
         googleApiClient = new GoogleApiClient.Builder(this, this, this).addApi(LocationServices.API).build();
 
-        edLoc = (EditText) findViewById(R.id.edLoc);
+        tvCoord = (TextView) findViewById(R.id.tvCoord);
         edHandle = (EditText) findViewById(R.id.edHandle);
         btnFindMe = (Button) findViewById(R.id.btnFindMe);
+
+        tvName = (TextView) findViewById(R.id.tvName);
+        tvURL = (TextView) findViewById(R.id.tvURL);
+        tvPrice = (TextView) findViewById(R.id.tvPrice);
+        tvAddress = (TextView) findViewById(R.id.tvAddress);
+        tvTelephone = (TextView) findViewById(R.id.tvTelephone);
+        imgBusiness = (ImageView) findViewById(R.id.imgBusiness);
+
+        tvURL.setClickable(true);
+        tvURL.setMovementMethod(LinkMovementMethod.getInstance());
 
         btnFindMe.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,7 +113,7 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
                     Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
                     lat = lastLocation.getLatitude();
                     lon = lastLocation.getLongitude();
-                    edLoc.setText("(" + lat + ", " + lon + ")");
+                    tvCoord.setText("(" + lat + ", " + lon + ")");
                     BusinessSearch.latitude = lat;
                     BusinessSearch.longitude = lon;
                 }
@@ -171,7 +175,6 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
         Log.i(FoodFinder.class.getSimpleName(), "Can't connect to Google Play Services!");
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -197,68 +200,22 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
 
     public void getPersonalityInsights(String text){
 
-        final TextView tvName = (TextView) findViewById(R.id.tvName);
-        final TextView tvURL = (TextView) findViewById(R.id.tvURL);
-        final TextView tvPrice = (TextView) findViewById(R.id.tvPrice);
-        final TextView tvAddress = (TextView) findViewById(R.id.tvAddress);
-        final TextView tvTelephone = (TextView) findViewById(R.id.tvTelephone);
-        final ImageView imgBusiness = (ImageView) findViewById(R.id.imgBusiness);
-
-        final ComputationalMatrix computationalMatrix = new ComputationalMatrix();
-
         PersonalityInsights service = new PersonalityInsights();
         service.setUsernameAndPassword(username, password);
 
         Profile profile = service.getProfile(text).execute();
 
         try {
-            j = new JSONObject(profile.toString());
+            jp.parseWatson(new JSONObject(profile.toString()));
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        jp.parseWatson(j);
         System.out.println(profile.toString());
 
-        try{
-            writeToFile(profile.toString(), this);
-        }catch (IOException e){
+        searchYelp();
 
-        }
 
-        computationalMatrix.calculateStandardForPrice(computationalMatrix.priceMap);
-        computationalMatrix.calculateStandardForRadius(computationalMatrix.radiusMap);
-        double rating = computationalMatrix.calculateStandardForRatings(computationalMatrix.ratingMap);
-        double review_count = computationalMatrix.calculateStandardForReviews(computationalMatrix.reviewsMap);
-        Log.d("Yelp", String.valueOf(rating) + ", " + String.valueOf(review_count));
-        BusinessSearch.term = "food";
-        BusinessSearch.limit = 1;
-        if(rating > review_count && Math.abs(rating-review_count) > 10){
-            BusinessSearch.sort_by = "rating";
-        }else if(review_count > rating && Math.abs(rating-review_count) > 10){
-            BusinessSearch.sort_by = "review_count";
-        }else{
-            BusinessSearch.sort_by = "best_match";
-        }
-        Log.d("Yelp Sort By", BusinessSearch.sort_by);
-        BusinessSearch.open_now = true;
-        yelp.businessSearch();
-        yelp.setListener(new Callback<Void>() {
-            @Override
-            public void onResult(Void result) {
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        tvName.setText("Name: " + SearchResponse.name);
-                        tvPrice.setText("Price: " + SearchResponse.price);
-                        tvAddress.setText("Address: " + SearchResponse.location);
-                        tvTelephone.setText("Telephone: " + SearchResponse.phone);
-                        tvURL.setText("Website: " + SearchResponse.url);
-                        new DownloadImageTask(imgBusiness).execute(SearchResponse.image_url);
-                    }
-                });
-            }
-        });
     }
 
     public void getTweets(String handle){
@@ -292,6 +249,45 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
         } catch (TwitterException te) {
             te.printStackTrace();
         }
+    }
+
+    public void searchYelp(){
+        final ComputationalMatrix computationalMatrix = new ComputationalMatrix();
+
+        computationalMatrix.calculateStandardForPrice(computationalMatrix.priceMap);
+        computationalMatrix.calculateStandardForRadius(computationalMatrix.radiusMap);
+        double rating = computationalMatrix.calculateStandardForRatings(computationalMatrix.ratingMap);
+        double review_count = computationalMatrix.calculateStandardForReviews(computationalMatrix.reviewsMap);
+        Log.d("Yelp", String.valueOf(rating) + ", " + String.valueOf(review_count));
+        BusinessSearch.term = "food";
+        BusinessSearch.limit = 1;
+        if(rating > review_count && Math.abs(rating-review_count) > 10){
+            BusinessSearch.sort_by = "rating";
+        }else if(review_count > rating && Math.abs(rating-review_count) > 10){
+            BusinessSearch.sort_by = "review_count";
+        }else{
+            BusinessSearch.sort_by = "best_match";
+        }
+        Log.d("Yelp Sort By", BusinessSearch.sort_by);
+        BusinessSearch.open_now = true;
+        yelp.businessSearch();
+        yelp.setListener(new Callback<Void>() {
+            @Override
+            public void onResult(Void result) {
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        tvName.setText("Name: " + SearchResponse.name);
+                        tvPrice.setText("Price: " + SearchResponse.price);
+                        tvAddress.setText("Address: " + SearchResponse.location);
+                        tvTelephone.setText("Telephone: " + SearchResponse.phone);
+                        String url = "<a href='" + SearchResponse.url + "'> Go to Yelp </a>";
+                        tvURL.setText(Html.fromHtml(url));
+                        new DownloadImageTask(imgBusiness).execute(SearchResponse.image_url);
+                    }
+                });
+            }
+        });
     }
 
     public void makeToast(int CASE){
@@ -328,10 +324,10 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
         }
 
         protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
+            String urlDisplay = urls[0];
             Bitmap mIcon11 = null;
             try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
+                InputStream in = new java.net.URL(urlDisplay).openStream();
                 mIcon11 = BitmapFactory.decodeStream(in);
             } catch (Exception e) {
                 Log.e("Error", e.getMessage());
