@@ -211,7 +211,7 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
             e.printStackTrace();
         }
 
-        System.out.println(profile.toString());
+//        System.out.println(profile.toString());
 
         searchYelp();
 

@@ -90,7 +90,8 @@ public class Yelp {
         urlBuilder.addQueryParameter("price", BusinessSearch.price);
         urlBuilder.addQueryParameter("open_now", String.valueOf(BusinessSearch.open_now));
         String url = urlBuilder.build().toString();
-        Log.d("Yelp", url);
+
+        Log.d("Yelp Search URL", url);
 
         Request request = new Request.Builder()
                 .header("Authorization", "Bearer " + access_token)
