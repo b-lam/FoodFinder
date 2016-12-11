@@ -1,14 +1,10 @@
 package com.example.johnteng.foodfinder;
 
-import android.content.Context;
 import android.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
-
 import okhttp3.Call;
 import okhttp3.FormBody;
 import okhttp3.HttpUrl;
@@ -22,27 +18,22 @@ import okhttp3.Response;
  */
 public class Yelp {
 
-    String client_id;
-    String client_secret;
-    String access_token;
-    static OkHttpClient client = new OkHttpClient();
+    private static final String YELP_CLIENT_ID = BuildConfig.YELP_CLIENT_ID;
+    private static final String YELP_CLIENT_SECRET = BuildConfig.YELP_CLIENT_SECRET;
+    private String access_token;
+    private static OkHttpClient client = new OkHttpClient();
     private com.example.johnteng.foodfinder.Callback<Void> mListener;
 
     public void setListener(com.example.johnteng.foodfinder.Callback<Void> listener) {
         mListener = listener;
     }
 
-    public Yelp(Context context){
-        client_id = context.getResources().getString(R.string.yelp_client_id);
-        client_secret = context.getResources().getString(R.string.yelp_client_secret);
-    }
-
     public void authenticate(){
 
         RequestBody requestBody = new FormBody.Builder()
                 .add("grant_type", "client_credentials")
-                .add("client_id", client_id)
-                .add("client_secret", client_secret)
+                .add("client_id", YELP_CLIENT_ID)
+                .add("client_secret", YELP_CLIENT_SECRET)
                 .build();
 
         Request request = new Request.Builder()

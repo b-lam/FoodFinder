@@ -54,13 +54,14 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
     private GoogleApiClient googleApiClient;
     private static final int PERMISSION_ACCESS_COARSE_LOCATION = 1;
     private EditText edHandle;
-    private Button btnFindMe;
     private double lat, lon;
-    private String username, password, url;
-    private final String TWITTER_CONSUMER_KEY = "GBBRn1BcbWy6WHboV4t24N7In";
-    private final String TWITTER_CONSUMER_SECRET = "78AS0Dnj46pui9bxU4g2IXVI4vfsOcJ92fF0eoNtxCrD3UaL4g";
-    private final String TWITTER_ACCESS_TOKEN = "335657764-ja1g5iImHeEirRq6CO9BEZlRijbT3UBFb5Q8brBa";
-    private final String TWITTER_ACCESS_TOKEN_SECRET = "su3uqGtU3hyFHDrGtPBeRxWQkrfry8NVW4IlbVWBZ1KGk";
+    private static final String TWITTER_CONSUMER_KEY = BuildConfig.TWITTER_CONSUMER_KEY;
+    private static final String TWITTER_CONSUMER_SECRET = BuildConfig.TWITTER_CONSUMER_SECRET;
+    private static final String TWITTER_ACCESS_TOKEN = BuildConfig.TWITTER_ACCESS_TOKEN;
+    private static final String TWITTER_ACCESS_TOKEN_SECRET = BuildConfig.TWITTER_ACCESS_TOKEN_SECRET;
+    private static final String WATSON_USERNAME = BuildConfig.WATSON_USERNAME;
+    private static final String WATSON_PASSWORD = BuildConfig.WATSON_PASSWORD;
+    private static final String WATSON_URL = "https://gateway.watsonplatform.net/PersonalityInsights-insights/api";
     private int CASE;
     AlertDialog dialogBuilder;
     public final jsonParser jp = new jsonParser();
@@ -82,18 +83,14 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
                     PERMISSION_ACCESS_COARSE_LOCATION);
         }
 
-        url = "https://gateway.watsonplatform.net/PersonalityInsights-insights/api";
-        username = "c710423e-c611-434f-89d3-aa4e0ce1f503";
-        password = "sDQqS0Kjdp74";
-
-        yelp = new Yelp(this);
+        yelp = new Yelp();
         yelp.authenticate();
 
         googleApiClient = new GoogleApiClient.Builder(this, this, this).addApi(LocationServices.API).build();
 
         tvCoord = (TextView) findViewById(R.id.tvCoord);
         edHandle = (EditText) findViewById(R.id.edHandle);
-        btnFindMe = (Button) findViewById(R.id.btnFindMe);
+        Button btnFindMe = (Button) findViewById(R.id.btnFindMe);
 
         tvName = (TextView) findViewById(R.id.tvName);
         tvURL = (TextView) findViewById(R.id.tvURL);
@@ -201,7 +198,7 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
     public void getPersonalityInsights(String text){
 
         PersonalityInsights service = new PersonalityInsights();
-        service.setUsernameAndPassword(username, password);
+        service.setUsernameAndPassword(WATSON_USERNAME, WATSON_PASSWORD);
 
         Profile profile = service.getProfile(text).execute();
 
@@ -214,7 +211,6 @@ public class FoodFinder extends AppCompatActivity implements GoogleApiClient.Con
 //        System.out.println(profile.toString());
 
         searchYelp();
-
 
     }
 

@@ -1,7 +1,4 @@
 <resources>
     <string name="app_name">Watson Eats</string>
     <string name="action_settings">How it Works</string>
-    <string name="yelp_client_id">gdVbp39VhWqOA-2TqmBKgA</string>
-    <string name="yelp_client_secret">KIfxxkx660gupyFIfQLdmneZGQmsVN3OJFWyC94EVNkcf53JGMly2KhXlj4ZG15T</string>
-
 </resources>
